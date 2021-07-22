@@ -4,8 +4,8 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import FeSwitch from './components/switch/index';
-import { ref } from '@vue/reactivity';
+import FeSwitch from './packages/switch/index';
+import { ref } from '@vue/reactivity';  
 export default {
   components: {
     FeSwitch
