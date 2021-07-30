@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import FeSwitch from './packages/switch/index';
+import FeSwitch from './components/switch/index';
 import { ref } from '@vue/reactivity';  
 export default {
   components: {
@@ -14,9 +14,13 @@ export default {
     const value1 = ref(false);
     const loading1 = ref(false);
     const beforeChange1 = () => false
-    console.log(111)
+    const test = function () {
+      console.log(value1.value)
+      value1.value = arguments[0]
+    }
     return {
       value1,
+      test,
       loading1,
       beforeChange1
     }

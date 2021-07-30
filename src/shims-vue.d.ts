@@ -2,8 +2,7 @@ import { Vue } from "vue-class-component";
 
 declare module '*.vue' {
   import { defineComponent } from 'vue'
-  const component: ReturnType<typeof defineComponent>
-  export default component
+  export default any
 }
 
 declare var jQuerys: (selector: string) => any;
