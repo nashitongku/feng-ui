@@ -1,12 +1,14 @@
 <template>
-  <div class="fe-switch" :class="{'active-class': isChecked, 'inactive-class': !isChecked}">
+  <div class="fe-switch" :class="{'active-class': isChecked, 'inactive-class': !isChecked, 'is_disabled': disabled}">
     <input
       class="fe-switch__input"
       :true-value="activeValue"
       :false-value="inactiveValue"
       type="checkbox"
      />
-      <span @click="onChange"  class="fe-switch__core" style="width: 40px;"></span>
+      <span v-if="activeText" class="active-text">{{activeText}}</span>
+      <span @click="onChange"  class="fe-switch__core" style="width: 40px;" ></span>
+      <span v-if="inactiveText" class="inactive-text" >{{inactiveText}}</span>
      <div class="fe-switch__action"></div>
   </div>
 </template>
@@ -25,7 +27,7 @@ interface ISwitchProps {
   inactiveText: string
   activeColor: string
   inactiveColor: string
-
+  disabled: boolean,
   activeValue: ValueType
   inactiveValue: ValueType
 }
@@ -67,11 +69,11 @@ export default defineComponent({
     },
     activeColor: {
       type: String,
-      default: '',
+      default: '#409eff',
     },
     inactiveColor: {
       type: String,
-      default: '',
+      default: '#dcdfe6',
     },
     activeValue: {
       type: [Boolean, String, Number],
@@ -90,7 +92,9 @@ export default defineComponent({
     })
 
     let onChange = function (){
-      console.log(props.modelValue, 'mol')
+      if(props.disabled){
+        return
+      }
       let val = isChecked.value ? props.inactiveValue : props.activeValue;
       ctx.emit("update:modelValue", val)
     }
@@ -105,38 +109,35 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
-@import '../../theme/css/global.fe.scss';
+<style lang="scss"  scoped>
+$activeColor: v-bind('activeColor');
+$inactiveColor: v-bind('inactiveColor');
 .fe-switch{
   cursor: pointer;
+  line-height: 20px;
+  &.is_disabled{
+    cursor: not-allowed;
+  }
   .fe-switch__input{
     width: 0;
     height: 0;
-
-    &.active-class {
-
-    }
-    &.inactive-class {
-
-      
-    }
+  }
+  & > *{
+    vertical-align: middle;
   }
   .fe-switch__core {
     position: relative;
     display: inline-block;
-    border-radius: 10px;
-    height: 20px;
-    border-color: $blue;
-    background-color: $blue;
     margin: 0;
-    display: inline-block;
-    position: relative;
+    background: $inactiveColor;
     width: 40px;
     height: 20px;
     border: 1px solid #dcdfe6;
+    vertical-align: middle;
     outline: none;
     border-radius: 10px;
     box-sizing: border-box;
+    user-select: none;
     transition: border-color .3s,background-color .3s;
     &:after {
       content: "";
@@ -153,11 +154,27 @@ export default defineComponent({
 
   &.active-class{
     .fe-switch__core{
+      border-color: $activeColor;
+      background-color: $activeColor;
       &:after{
         left: 100%;
         margin-left: -17px;
       }
     }
+    .active-text{
+      color: $activeColor;
+    }
+    .inactive-text{
+      color: $inactiveColor;
+    }
+  }
+  .active-text{
+    color: $inactiveColor;
+    margin-right: 5px;
+  }
+  .inactive-text{
+    color: $activeColor;
+    margin-left: 5px;
   }
 }
 </style>
