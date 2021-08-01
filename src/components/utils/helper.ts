@@ -7,6 +7,16 @@ const utils = {
             }
         }
     },
+    inViewReport: function (windowWidth=0,windowHeight=0, {x=0, y=0, bottom=0, right=0}){
+        if(x > 0 && x < windowWidth && y > 0 && y < windowHeight){
+            return true
+        }
+        if(right > 0 && right < windowWidth && bottom > 0 && bottom < windowHeight){
+            return true
+        }
+
+        return  false;
+    }
 
 }
 export default utils;

@@ -1,5 +1,5 @@
 <template>
-  <fe-image v-for="item in imgs"  :src="item"/>
+  <fe-image v-for="item in imgs" width="100" height="60" :src="item"/>
 <!--  <fe-switch v-model="value1" :active-text="'测试'" :inactive-text="'33333'" :loading="loading1" :beforeChange="beforeChange1" />-->
 </template>
 
