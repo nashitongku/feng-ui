@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="fe-image-viewer" @click="onClick">
-    <img ref="img" class="fe-image" :src="src" :style="{maxHeight: maxHeight,width: imageWidth+'px', height: imageHeight+'px'}"/>
+    <img ref="img" class="fe-image" :class="{'full-screen': isFull}" :src="src" />
     <span style="vertical-align: middle"></span>
     <i @click="onClose" class="iconfont icon-ic_searchclosed"></i>
 
@@ -9,13 +9,13 @@
       <i @click="onZoomIn" class="iconfont icon-fangdajing"></i>
       <i @click="onRotateR" class="iconfont icon-xuanzhuan"></i>
       <i @click="onRotateL" class="iconfont icon-xuanzhuan1"></i>
-      <i @click="onFullScreen" class="iconfont icon-fullScreen"></i>
+      <i @click="onFullScreen" class="iconfont" :class="{'icon-fullscreen-exit': isFull, 'icon-fullScreen': !isFull}"></i>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, Ref, ref, watchEffect} from "vue";
+import {computed, defineComponent, Ref, ref, watchEffect} from "vue";
 
 export default defineComponent({
   name: "image-viewer",
@@ -56,63 +56,47 @@ export default defineComponent({
       }
     })
 
-    let imageWidth:any = ref(null);
-    let imageHeight:any = ref(null);
-    let maxHeight:any = ref('100%')
-    let changeR = 0.2;
-    const objectFit = ref('contain')
+    let rotation = ref(0);
+    let scale = ref(1);
+    let transform: any = computed(() => {
+      return `scale(${scale.value}) rotate(${rotation.value}deg)`;
+    });
+    let zoomStep = 0.2;
+    let isFull = ref(false)
+    const objectFit =  computed(() => {
+      return isFull.value ? 'cover' : 'contain'
+    })
     const onZoomOut = function () {
-      let {width, height} = img.value.getBoundingClientRect();
-      let r = height / width;
-      width = width * (1 - changeR);
-      height = r * width;
-      if (width < 120 || height < 120) {
-        return
-      }
-      imageHeight.value = height;
-      imageWidth.value = width;
+      scale.value = scale.value - zoomStep;
     }
 
     const onZoomIn = function () {
-      let {width, height} = img.value.getBoundingClientRect();
-      let r = height / width;
-      width = width * (1 + changeR);
-      height = r * width;
-
-      maxHeight.value = null;
-      imageHeight.value = height;
-      imageWidth.value = width;
+      scale.value = scale.value + zoomStep;
     }
 
-    let rotation = 0;
     const onRotateR = function () {
-      rotation = (rotation + 90) ;
-      img.value.style.transform = 'rotate('+rotation+'deg)';
+      rotation.value = (rotation.value + 90) ;
     }
     const onRotateL = function () {
-      rotation = (rotation - 90) ;
-      img.value.style.transform = 'rotate('+rotation+'deg)';
+      rotation.value = (rotation.value - 90) ;
 
     }
 
     const onFullScreen = function () {
-      objectFit.value = 'cover'
-      imageHeight.value = '100%';
-      imageWidth.value = '100%'
-      console.log(22)
+      scale.value = 1;
+      rotation.value = 0;
+      isFull.value = !isFull.value
     }
 
     const onClose = function () {
       ctx.emit("update:visible", false)
     }
 
-
     return {
       img,
-      imageWidth,
-      imageHeight,
-      maxHeight,
+      transform,
       objectFit,
+      isFull,
       onClick,
       onZoomOut,
       onZoomIn,
@@ -145,7 +129,9 @@ export default defineComponent({
   display: inline-block;
   object-fit: v-bind(objectFit);
   vertical-align: middle;
+  transform: v-bind(transform);
   transition: all 0.2s ease;
+
 }
 
 .iconfont {
@@ -160,7 +146,10 @@ export default defineComponent({
   top: 20px;
   font-size: 30px;
 }
-
+.full-screen{
+  width: 100%;
+  height: 100%;
+}
 .image-action {
   position: absolute;
   bottom: 20px;
